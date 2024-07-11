@@ -1,0 +1,7 @@
+streamlit
+rapidfuzz
+pandas
+numpy
+openpyxl
+jellyfish
+joblib
