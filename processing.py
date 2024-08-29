@@ -38,6 +38,17 @@ def encontrar_mejor_coincidencia(personas_df, nombre, itera, umbral):
         else:
             return 100 * jellyfish.jaro_winkler_similarity(palabra, x_palabra)
     
+    def verificar_palabras(cadena):
+        palabras = cadena.split()
+        
+        if len(palabras) == 3:
+            for palabra in palabras:
+                if len(palabra) < 3:
+                    return False
+            return True
+        else:
+            return False
+    
 
     def calcular_similitud(nombreFuente):
         # nombreFuente
@@ -66,7 +77,7 @@ def encontrar_mejor_coincidencia(personas_df, nombre, itera, umbral):
     # personas_df['similitud'] = personas_df['Nombre Completo'].apply(calcular_similitud)
     personas_coincidentes = personas_df[personas_df['similitud'] >= umbral].sort_values(by='similitud', ascending=False)
 
-    if not personas_coincidentes.empty and itera < 2:
+    if not personas_coincidentes.empty and itera < 2 and verificar_palabras(nombre):
         new_umbral=personas_coincidentes.iloc[0]['similitud']
         if new_umbral <90:
             new_umbral=90
