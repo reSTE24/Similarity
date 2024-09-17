@@ -8,12 +8,14 @@ from processing import (
     grabar
 )
 from helpers import transformar_cadena
+from dni import verificar_dni
 
 # Navbar V2
 st.sidebar.title("Navegación V2")
 opcion_v2 = st.sidebar.radio("Ir a", ["Subir archivo y procesar quejas V2", 
                                       "Subir archivo y buscar coincidencias V2",
-                                      "Comprobar quejas V2"])
+                                      "Comprobar quejas V2",
+                                       "Comprobar DNI"])
 
 if opcion_v2 == "Subir archivo y buscar coincidencias V2":
     st.title('Subir archivo CSV y buscar coincidencias V2')
@@ -84,6 +86,20 @@ elif opcion_v2 == "Comprobar quejas V2":
         
         csv = df_resultados.to_csv(index=False)
         st.download_button(label="Descargar datos como CSV", data=csv, file_name='nombreArchivoQueja.csv', mime='text/csv')
+
+elif opcion_v2 == "Comprobar DNI":
+    st.title('Subir archivo CSV de sus quejas y reclamos V2')
+    st.write('Sube un archivo CSV de quejas y reclamos.')
+
+    uploaded_file = st.file_uploader("Elige un archivo CSV", type="csv")
+
+    if uploaded_file is not None :
+        df = pd.read_csv(uploaded_file)
+        # df['puntuacion'] = df.apply(calcular_puntuacion, axis=1)
+        df = df[['Nro. Documento', 'Nombre Completo']]
+        st.write('Archivo cargado exitosamente')
+        csv = verificar_dni(df).to_csv(index=False)
+        st.download_button(label="Descargar datos como CSV", data=csv, file_name='DNICheck.csv', mime='text/csv')
 
 # Guardar el código en un archivo llamado app.py y ejecutarlo con:
 # streamlit run app.py

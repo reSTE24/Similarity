@@ -28,52 +28,57 @@ def seleccionar_columana(nombre,columnas):
 
     return nombre_columna_max_similitud
 
+def custom_similarity(palabra, x_palabra):
+    if len(palabra) <= 3 and len(x_palabra) <= 3:
+        return fuzz.partial_token_sort_ratio(palabra, x_palabra)
+    else:
+        return 100 * jellyfish.jaro_winkler_similarity(palabra, x_palabra)
+    
+def verificar_palabras(cadena):
+    palabras = cadena.split()
+        
+    if len(palabras) == 3:
+        for palabra in palabras:
+            if len(palabra) < 3:
+                return False
+        return True
+    else:
+        return False
+    
+
+def calcular_similitud(nombreFuente,nombre,tipo):
+    # nombreFuente
+    nombreFuente = transformar_cadena(nombreFuente)
+    nombreF_palabras = nombreFuente.split()
+    if(tipo==1):
+        nombre = transformar_cadena(nombre)
+    nombre_palabras = nombre.split()
+    # palabra_similitudes = [max([100 * jellyfish.jaro_winkler_similarity(palabra, x_palabra) for x_palabra in nombreF_palabras]) for palabra in nombre_palabras]
+    palabra_similitudes = [
+    max([custom_similarity(palabra, x_palabra) for x_palabra in nombreF_palabras]) 
+    for palabra in nombre_palabras
+    ]
+    palabra_similitudes.sort(reverse=True)
+    # print(palabra_similitudes)
+    min_len = max(3, min(len(nombre_palabras), len(nombreF_palabras)))
+    palabra_similitudes = palabra_similitudes[:min_len]
+    promedio_palabra_similitud = sum(palabra_similitudes) / len(palabra_similitudes)
+    errores_ortograficos1 = 100 * jellyfish.jaro_winkler_similarity(nombre, nombreFuente)
+    if promedio_palabra_similitud - errores_ortograficos1 > 7:
+        # errores_ortograficos1 = max(fuzz.token_sort_ratio(nombre, nombreFuente),fuzz.partial_token_sort_ratio(nombre, nombreFuente))
+        errores_ortograficos1 = max(errores_ortograficos1,fuzz.token_sort_ratio(nombre, nombreFuente),fuzz.partial_token_sort_ratio(nombre, nombreFuente))
+    penalizacion = (100 - errores_ortograficos1) / 4
+    puntuacion_final = promedio_palabra_similitud - penalizacion
+    return puntuacion_final
+
+
+
 def encontrar_mejor_coincidencia(personas_df, nombre, itera, umbral):
 
     nombre = transformar_cadena(nombre)
 
-    def custom_similarity(palabra, x_palabra):
-        if len(palabra) <= 3 and len(x_palabra) <= 3:
-            return fuzz.partial_token_sort_ratio(palabra, x_palabra)
-        else:
-            return 100 * jellyfish.jaro_winkler_similarity(palabra, x_palabra)
-    
-    def verificar_palabras(cadena):
-        palabras = cadena.split()
-        
-        if len(palabras) == 3:
-            for palabra in palabras:
-                if len(palabra) < 3:
-                    return False
-            return True
-        else:
-            return False
-    
-
-    def calcular_similitud(nombreFuente):
-        # nombreFuente
-        nombreFuente = transformar_cadena(nombreFuente)
-        nombreF_palabras = nombreFuente.split()
-        nombre_palabras = nombre.split()
-        # palabra_similitudes = [max([100 * jellyfish.jaro_winkler_similarity(palabra, x_palabra) for x_palabra in nombreF_palabras]) for palabra in nombre_palabras]
-        palabra_similitudes = [
-        max([custom_similarity(palabra, x_palabra) for x_palabra in nombreF_palabras]) 
-        for palabra in nombre_palabras
-        ]
-        palabra_similitudes.sort(reverse=True)
-        # print(palabra_similitudes)
-        min_len = max(3, min(len(nombre_palabras), len(nombreF_palabras)))
-        palabra_similitudes = palabra_similitudes[:min_len]
-        promedio_palabra_similitud = sum(palabra_similitudes) / len(palabra_similitudes)
-        errores_ortograficos1 = 100 * jellyfish.jaro_winkler_similarity(nombre, nombreFuente)
-        if promedio_palabra_similitud - errores_ortograficos1 > 7:
-            # errores_ortograficos1 = max(fuzz.token_sort_ratio(nombre, nombreFuente),fuzz.partial_token_sort_ratio(nombre, nombreFuente))
-            errores_ortograficos1 = max(errores_ortograficos1,fuzz.token_sort_ratio(nombre, nombreFuente),fuzz.partial_token_sort_ratio(nombre, nombreFuente))
-        penalizacion = (100 - errores_ortograficos1) / 4
-        puntuacion_final = promedio_palabra_similitud - penalizacion
-        return puntuacion_final
     # return calcular_similitud('Aliaga Marin Pilar Rosa')
-    personas_df['similitud'] = Parallel(n_jobs=-1)(delayed(calcular_similitud)(nombre) for nombre in personas_df['Nombre Completo'])
+    personas_df['similitud'] = Parallel(n_jobs=-1)(delayed(calcular_similitud)(nombreFuente,nombre,0) for nombreFuente in personas_df['Nombre Completo'])
     # personas_df['similitud'] = personas_df['Nombre Completo'].apply(calcular_similitud)
     personas_coincidentes = personas_df[personas_df['similitud'] >= umbral].sort_values(by='similitud', ascending=False)
 
