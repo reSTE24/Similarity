@@ -7,4 +7,5 @@ jellyfish
 joblib
 selenium 
 webdriver-manager
-BeautifulSoup
+requests
+beautifulsoup4
