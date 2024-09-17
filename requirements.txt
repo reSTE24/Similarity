@@ -5,3 +5,5 @@ numpy
 openpyxl
 jellyfish
 joblib
+selenium 
+webdriver-manager
