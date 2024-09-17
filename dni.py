@@ -1,3 +1,4 @@
+
 # from selenium import webdriver
 # from selenium.webdriver.chrome.service import Service
 # from selenium.webdriver.chrome.options import Options
@@ -87,9 +88,7 @@ def verificar_dni(df):
     
     return df
 
-
 # Ejemplo de uso
-
-# dni = "20052783"
-# resultado = buscar_datos_por_dni(dni)
-# print(f"El resultado de la búsqueda es: {resultado}")
+dni = "20052783"
+resultado = buscar_datos_por_dni(dni)
+print(f"El resultado de la búsqueda es: {resultado}")

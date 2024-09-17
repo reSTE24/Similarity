@@ -5,3 +5,7 @@ numpy
 openpyxl
 jellyfish
 joblib
+selenium 
+webdriver-manager
+requests
+beautifulsoup4
