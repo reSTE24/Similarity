@@ -13,7 +13,7 @@ def buscar_datos_por_dni(dni):
     url = "https://eldni.com/pe/buscar-datos-por-dni"
     # Configurar opciones de Chrome
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+     # chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
