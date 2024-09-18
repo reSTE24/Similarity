@@ -96,7 +96,7 @@ elif opcion_v2 == "Comprobar DNI":
     if uploaded_file is not None :
         df = pd.read_csv(uploaded_file)
         # df['puntuacion'] = df.apply(calcular_puntuacion, axis=1)
-        df = df[['Nro. Documento', 'Nombre Completo']]
+        # df = df[['Nro. Documento', 'Nombre Completo']]
         st.write('Archivo cargado exitosamente')
         csv = verificar_dni(df).to_csv(index=False)
         st.download_button(label="Descargar datos como CSV", data=csv, file_name='DNICheck.csv', mime='text/csv')
