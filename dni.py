@@ -73,16 +73,16 @@ def verificar_dni(df):
         # Obtener los datos de la función buscar_datos_por_dni
         datos_dni = buscar_datos_por_dni(dni)
         
-        # Calcular la similitud
-        similitud = calcular_similitud(nombre, datos_dni, 1)
         
-        # Actualizar la columna 'Correcto' basándonos en la similitud
-        if similitud >= umbral:
-            df.at[index, 'Correcto'] = 1
-        
-        # Guardar los datos obtenidos en 'NOMBRERENIEC'
-        df.at[index, 'NOMBRERENIEC'] = datos_dni
-        
+        if nombre != none:
+            # Calcular la similitud
+            similitud = calcular_similitud(nombre, datos_dni, 1)
+            # Guardar los datos obtenidos en 'NOMBRERENIEC'
+            df.at[index, 'NOMBRERENIEC'] = datos_dni
+            if similitud >= umbral:
+                # Actualizar la columna 'Correcto' basándonos en la similitud
+                df.at[index, 'Correcto'] = 1
+
         # Añadir un pequeño retraso para evitar sobrecargar el servidor
         time.sleep(random.uniform(1, 3))
     
