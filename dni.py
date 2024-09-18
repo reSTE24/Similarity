@@ -67,8 +67,8 @@ def verificar_dni(df):
     umbral = 92
     
     for index, row in df.iterrows():
-        dni = row['Nro. Documento']
-        nombre = row["Nombre Completo"]
+        dni = row['DNI']
+        nombre = row["Nombre del Titular"]
         
         # Obtener los datos de la función buscar_datos_por_dni
         datos_dni = buscar_datos_por_dni(dni)
