@@ -1,4 +1,5 @@
 import streamlit as st
+import io
 import pandas as pd
 from processing import (
     calcular_puntuacion,
@@ -94,12 +95,67 @@ elif opcion_v2 == "Comprobar DNI":
     uploaded_file = st.file_uploader("Elige un archivo CSV", type="csv")
 
     if uploaded_file is not None :
-        df = pd.read_csv(uploaded_file)
+        # df = pd.read_csv(uploaded_file)
+        try:
+            df = pd.read_csv(uploaded_file, sep=';', encoding='utf-8')
+        except UnicodeDecodeError:
+            try:
+                df = pd.read_csv(uploaded_file,sep=';',  encoding='ISO-8859-1')  # También conocido como latin1
+            except UnicodeDecodeError:
+                df = pd.read_csv(uploaded_file, sep=';', encoding='cp1252')  # Otra codificación común
+        
         # df['puntuacion'] = df.apply(calcular_puntuacion, axis=1)
         # df = df[['Nro. Documento', 'Nombre Completo']]
         st.write('Archivo cargado exitosamente')
-        csv = verificar_dni(df).to_csv(index=False)
-        st.download_button(label="Descargar datos como CSV", data=csv, file_name='DNICheck.csv', mime='text/csv')
+        # Identificar filas duplicadas
+        df['DNI'] = df['DNI'].astype(int)
+ # COLOCAL       
+        # duplicados = df.duplicated(keep=False)
+
+        # # Reemplazar las filas duplicadas con NaN
+        # df.loc[duplicados] = None
+        # # Procesar el archivo en bloques de 10 filas
+# FIN
+# BORRA
+        # Contar ocurrencias y filtrar las que se repiten
+        repetidos = df[df.duplicated(keep=False)]
+
+        # Eliminar duplicados para mostrar solo una vez cada entrada repetida
+        df = repetidos.drop_duplicates()
+# FIN
+        total_filas = len(df)
+        total_bloques = (total_filas - 1) //660 + 1
+
+        # Crear un selector para elegir el bloque
+        bloque_seleccionado = st.selectbox("Selecciona el bloque a descargar", 
+                                        range(1, total_bloques + 1))
+
+        if st.button("Descargar bloque seleccionado"):
+            # Calcular el índice de inicio del bloque seleccionado
+            inicio = (bloque_seleccionado - 1) * 660
+            
+            # Seleccionar el bloque de 30 filas (o menos si es el último bloque)
+            bloque = df.iloc[inicio:inicio+660]
+            bloque = verificar_dni(bloque)  # Aplicar verificación de DNI en el bloque
+
+            # Convertir el bloque a CSV
+            csv_bloque = bloque.to_csv(index=False)
+
+            # Definir el nombre del archivo
+            file_name = f'DNICheck_{bloque_seleccionado}.csv'
+
+            # Crear un objeto BytesIO para el archivo CSV
+            towrite = io.BytesIO()
+            towrite.write(csv_bloque.encode())
+            towrite.seek(0)
+
+            # Descargar el archivo
+            st.download_button(
+                label="Haz clic para descargar",
+                data=towrite,
+                file_name=file_name,
+                mime='text/csv'
+            )
 
 # Guardar el código en un archivo llamado app.py y ejecutarlo con:
 # streamlit run app.py

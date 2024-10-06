@@ -14,7 +14,7 @@ def transformar_cadena(cadena):
     
     for patron, reemplazo in reglas:
         cadena = re.sub(patron, reemplazo, cadena)
-
+    cadena = re.sub(r'[^a-zA-Z0-9\s]', '', cadena)
     cadena = ' '.join(cadena.strip().split())
     cadena = cadena.upper()
     cadena = unicodedata.normalize('NFKD', cadena).encode('ascii', errors='ignore').decode('utf-8')
